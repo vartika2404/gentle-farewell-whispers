@@ -2,7 +2,11 @@
 import React, { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { PlayCircle, Clock, Download, Heart } from 'lucide-react';
+import { PlayCircle, Clock, Download, Heart, Globe, Phone, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 
 interface FormData {
   senderName: string;
@@ -23,8 +27,11 @@ const RecipientPreview = () => {
   const location = useLocation();
   const state = location.state as LocationState;
   
-  const [messageState, setMessageState] = useState<'unopened' | 'opened' | 'declined'>('unopened');
+  const [messageState, setMessageState] = useState<'unopened' | 'opened' | 'declined' | 'authenticate' | 'confirmed'>('unopened');
   const [audioPlaying, setAudioPlaying] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Use either the form data passed from the sender form, or default preview data
   const senderName = state?.formData?.senderName || 'Alex';
@@ -33,7 +40,7 @@ const RecipientPreview = () => {
     "Jordan, I've been reflecting on our time together and felt I needed to express my gratitude for the good moments we shared. While things didn't work out between us, I learned so much about myself through our relationship. I hope you're finding peace and happiness on your journey. This isn't asking for a response - just wanted to share these thoughts one last time. Take care.";
   
   const handleOpenMessage = () => {
-    setMessageState('opened');
+    setMessageState('authenticate');
   };
   
   const handleDeclineMessage = () => {
@@ -42,6 +49,41 @@ const RecipientPreview = () => {
   
   const toggleAudio = () => {
     setAudioPlaying(!audioPlaying);
+  };
+
+  const handlePhoneSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate sending verification code
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success('Verification code sent to your phone');
+      // In a real app, this would trigger an API call to send an OTP
+    }, 1500);
+  };
+
+  const handleVerifyCode = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate verification
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setMessageState('opened');
+      toast.success('Phone verified successfully');
+    }, 1500);
+  };
+
+  const handleConfirmSend = () => {
+    setIsSubmitting(true);
+    
+    // Simulate sending message
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setMessageState('confirmed');
+      toast.success('Your message has been sent');
+    }, 2000);
   };
   
   const expiryTime = new Date();
@@ -92,6 +134,88 @@ const RecipientPreview = () => {
               <p className="text-xs text-softGrey mt-6">
                 This message will be available for 7 days. After you open it, it will expire in 24 hours.
               </p>
+            </div>
+          )}
+
+          {messageState === 'authenticate' && (
+            <div className="text-center">
+              <Phone className="w-16 h-16 text-buttonPrimary mx-auto mb-6" />
+              
+              <h1 className="text-2xl font-bold mb-4">
+                Verify your phone number
+              </h1>
+              
+              <p className="text-softGrey mb-8 leading-relaxed">
+                For your privacy and security, we need to verify your phone number 
+                before showing you the message from {senderName}.
+              </p>
+              
+              {verificationCode === '' ? (
+                <form onSubmit={handlePhoneSubmit} className="space-y-4 max-w-sm mx-auto">
+                  <div className="text-left">
+                    <label htmlFor="phoneNumber" className="block mb-2 font-medium">Your phone number</label>
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="+1 (234) 567-8901"
+                      className="input-field"
+                      required
+                    />
+                    <p className="text-xs text-softGrey mt-1">Include your country code (e.g., +1 for USA)</p>
+                  </div>
+                  
+                  <Button 
+                    type="submit"
+                    className="w-full bg-buttonPrimary hover:bg-buttonHover"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Sending...' : 'Send verification code'}
+                  </Button>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyCode} className="space-y-4 max-w-sm mx-auto">
+                  <div className="text-center">
+                    <label htmlFor="verificationCode" className="block mb-2 font-medium">Enter the 6-digit code sent to your phone</label>
+                    <div className="flex justify-center mb-4">
+                      <InputOTP 
+                        maxLength={6}
+                        value={verificationCode}
+                        onChange={(value) => setVerificationCode(value)}
+                      >
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </div>
+                    <p className="text-xs text-softGrey mb-4">
+                      Didn't receive a code? <button type="button" className="text-buttonPrimary hover:underline">Resend</button>
+                    </p>
+                  </div>
+                  
+                  <Button 
+                    type="submit"
+                    className="w-full bg-buttonPrimary hover:bg-buttonHover"
+                    disabled={isSubmitting || verificationCode.length !== 6}
+                  >
+                    {isSubmitting ? 'Verifying...' : 'Verify and continue'}
+                  </Button>
+                </form>
+              )}
+              
+              <button 
+                type="button"
+                onClick={() => setMessageState('unopened')}
+                className="mt-6 text-sm text-softGrey hover:text-buttonPrimary"
+              >
+                ← Go back
+              </button>
             </div>
           )}
           
@@ -146,6 +270,21 @@ const RecipientPreview = () => {
               <p className="text-xs text-center text-softGrey mt-6">
                 This message will expire on {expiryTime.toLocaleString()} and cannot be accessed after that time.
               </p>
+
+              {!state?.preview && (
+                <div className="mt-8 pt-8 border-t border-dustyRose">
+                  <button 
+                    onClick={handleConfirmSend}
+                    className="btn-primary w-full flex items-center justify-center gap-2"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Sending...' : 'Send message to recipient'}
+                  </button>
+                  <p className="text-xs text-center text-softGrey mt-2">
+                    The message will be sent to the phone number you provided
+                  </p>
+                </div>
+              )}
             </div>
           )}
           
@@ -170,7 +309,41 @@ const RecipientPreview = () => {
               </button>
             </div>
           )}
+
+          {messageState === 'confirmed' && (
+            <div className="text-center">
+              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
+              
+              <h2 className="text-2xl font-bold mb-6">Message sent successfully</h2>
+              
+              <p className="text-softGrey mb-8 leading-relaxed">
+                Your message has been successfully sent to {recipientName}.
+                They will receive it on their phone via WhatsApp.
+              </p>
+              
+              <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mb-8">
+                <p className="text-green-800">
+                  Thank you for using Closure to communicate respectfully.
+                </p>
+              </div>
+              
+              <Link to="/" className="btn-primary">
+                Return to home
+              </Link>
+
+              <p className="text-xs text-center text-softGrey mt-6">
+                Remember, you can send one message per month, and one message every 90 days to the same recipient.
+              </p>
+            </div>
+          )}
         </div>
+
+        {messageState !== 'confirmed' && (
+          <div className="mt-8 flex justify-center items-center text-softGrey text-sm">
+            <Globe className="w-4 h-4 mr-2" />
+            <span>Available worldwide for sending one-time messages</span>
+          </div>
+        )}
       </div>
     </Layout>
   );

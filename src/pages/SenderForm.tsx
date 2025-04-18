@@ -1,9 +1,10 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { Calendar, Clock, Volume2 } from 'lucide-react';
+import { Calendar, Clock, Volume2, Phone, Globe } from 'lucide-react';
 import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 
 const SenderForm = () => {
   const navigate = useNavigate();
@@ -19,6 +20,9 @@ const SenderForm = () => {
   
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationSent, setVerificationSent] = useState(false);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -38,7 +42,15 @@ const SenderForm = () => {
         return;
       }
     }
-    setStep(prev => prev + 1);
+    if (step === 3) {
+      if (formData.deliveryOption === 'custom' && !formData.deliveryDate) {
+        toast.error('Please select a delivery date');
+        return;
+      }
+      setStep(4); // Move to phone verification
+    } else {
+      setStep(prev => prev + 1);
+    }
   };
   
   const handleBack = () => {
@@ -47,9 +59,40 @@ const SenderForm = () => {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (step < 4) {
+      handleNext();
+      return;
+    }
+    
+    // Last step - verify and submit
+    if (!verificationSent) {
+      sendVerificationCode();
+    } else {
+      verifyAndSubmit();
+    }
+  };
+  
+  const sendVerificationCode = () => {
     setIsSubmitting(true);
     
-    // Simulate API call
+    // Simulate sending OTP
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setVerificationSent(true);
+      toast.success('Verification code sent to your phone');
+    }, 1500);
+  };
+  
+  const verifyAndSubmit = () => {
+    if (verificationCode.length !== 6) {
+      toast.error('Please enter a valid 6-digit code');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    // Simulate verification and submission
     setTimeout(() => {
       setIsSubmitting(false);
       toast.success('Your message has been scheduled for delivery');
@@ -76,6 +119,10 @@ const SenderForm = () => {
             <div className={`flex-1 text-center ${step >= 3 ? 'text-buttonPrimary' : 'text-softGrey'}`}>
               <div className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center ${step >= 3 ? 'bg-buttonPrimary text-white' : 'bg-softGrey/20 text-softGrey'}`}>3</div>
               <p className="mt-1 text-sm">Delivery</p>
+            </div>
+            <div className={`flex-1 text-center ${step >= 4 ? 'text-buttonPrimary' : 'text-softGrey'}`}>
+              <div className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center ${step >= 4 ? 'bg-buttonPrimary text-white' : 'bg-softGrey/20 text-softGrey'}`}>4</div>
+              <p className="mt-1 text-sm">Verify</p>
             </div>
           </div>
           
@@ -297,7 +344,90 @@ const SenderForm = () => {
                 </div>
               </div>
             )}
+            
+            {step === 4 && (
+              <div className="space-y-6">
+                <div className="text-center mb-4">
+                  <Phone className="w-12 h-12 text-buttonPrimary mx-auto mb-2" />
+                  <h2 className="text-xl font-medium">Verify your identity</h2>
+                  <p className="text-softGrey">Before sending, please verify your phone number</p>
+                </div>
+                
+                {!verificationSent ? (
+                  <div>
+                    <label htmlFor="senderPhone" className="block mb-2 font-medium">Your phone number *</label>
+                    <Input
+                      type="tel"
+                      id="senderPhone"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="+1 (234) 567-8901"
+                      className="input-field"
+                      required
+                    />
+                    <p className="text-xs text-softGrey mt-1">Include your country code (e.g., +1 for USA)</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <label className="block mb-2 font-medium">Enter the 6-digit code sent to your phone</label>
+                    <div className="flex justify-center mb-4">
+                      <InputOTP 
+                        maxLength={6}
+                        value={verificationCode}
+                        onChange={(value) => setVerificationCode(value)}
+                      >
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </div>
+                    <p className="text-xs text-softGrey mb-4 text-center">
+                      Didn't receive a code? <button type="button" onClick={() => setVerificationSent(false)} className="text-buttonPrimary hover:underline">Try again</button>
+                    </p>
+                  </div>
+                )}
+                
+                <div className="border-t border-dustyRose pt-6 mt-6">
+                  <h3 className="font-medium mb-4">Message Summary:</h3>
+                  <ul className="text-sm space-y-2 mb-6">
+                    <li><span className="text-softGrey">To:</span> {formData.recipientName} ({formData.recipientPhone})</li>
+                    <li><span className="text-softGrey">From:</span> {formData.senderName}</li>
+                    <li><span className="text-softGrey">Delivery:</span> {formData.deliveryOption === 'now' ? 'Immediately' : 
+                      formData.deliveryOption === '24hours' ? 'In 24 hours' : 
+                      new Date(formData.deliveryDate).toLocaleString()}</li>
+                    <li><span className="text-softGrey">Includes audio:</span> {formData.audioFile ? 'Yes' : 'No'}</li>
+                  </ul>
+                </div>
+                
+                <div className="flex justify-between pt-4">
+                  <button 
+                    type="button" 
+                    onClick={handleBack}
+                    className="btn-secondary"
+                  >
+                    Back
+                  </button>
+                  <button 
+                    type="submit"
+                    className="btn-primary flex items-center gap-2"
+                    disabled={isSubmitting || (verificationSent && verificationCode.length !== 6)}
+                  >
+                    {isSubmitting ? 'Processing...' : verificationSent ? 'Verify & Send' : 'Send verification code'}
+                  </button>
+                </div>
+              </div>
+            )}
           </form>
+        </div>
+        
+        <div className="mt-8 flex justify-center items-center text-softGrey text-sm">
+          <Globe className="w-4 h-4 mr-2" />
+          <span>Available worldwide for sending one-time messages</span>
         </div>
       </div>
     </Layout>
