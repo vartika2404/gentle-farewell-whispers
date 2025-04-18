@@ -23,7 +23,9 @@ const SenderForm = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationSent, setVerificationSent] = useState(false);
-  
+  const [senderPhoneVerified, setSenderPhoneVerified] = useState(false);
+  const [verifiedPhone, setVerifiedPhone] = useState('');
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -99,7 +101,12 @@ const SenderForm = () => {
       navigate('/preview', { state: { preview: true, formData } });
     }, 1500);
   };
-  
+
+  const handlePhoneVerificationComplete = (phoneNumber: string) => {
+    setSenderPhoneVerified(true);
+    setVerifiedPhone(phoneNumber);
+  };
+
   return (
     <Layout>
       <div className="max-w-xl mx-auto py-8 animate-fade-in">
@@ -129,58 +136,76 @@ const SenderForm = () => {
           <form onSubmit={handleSubmit}>
             {step === 1 && (
               <div className="space-y-6">
-                <div>
-                  <label htmlFor="senderName" className="block mb-2 font-medium">Your name *</label>
-                  <input
-                    type="text"
-                    id="senderName"
-                    name="senderName"
-                    placeholder="Your name..."
-                    value={formData.senderName}
-                    onChange={handleChange}
-                    className="input-field"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="recipientName" className="block mb-2 font-medium">Recipient's name *</label>
-                  <input
-                    type="text"
-                    id="recipientName"
-                    name="recipientName"
-                    placeholder="Their name..."
-                    value={formData.recipientName}
-                    onChange={handleChange}
-                    className="input-field"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="recipientPhone" className="block mb-2 font-medium">Recipient's WhatsApp number *</label>
-                  <input
-                    type="tel"
-                    id="recipientPhone"
-                    name="recipientPhone"
-                    placeholder="+1234567890"
-                    value={formData.recipientPhone}
-                    onChange={handleChange}
-                    className="input-field"
-                    required
-                  />
-                  <p className="text-xs text-softGrey mt-1">Must include country code (e.g., +1 for USA)</p>
-                </div>
-                
-                <div className="pt-4">
-                  <button 
-                    type="button" 
-                    onClick={handleNext}
-                    className="btn-primary w-full"
-                  >
-                    Continue
-                  </button>
-                </div>
+                {!senderPhoneVerified ? (
+                  <div className="mb-6">
+                    <h3 className="font-medium mb-4">Verify your phone number *</h3>
+                    <PhoneVerification onVerificationComplete={handlePhoneVerificationComplete} />
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block mb-2 font-medium">Your verified phone number</label>
+                      <input
+                        type="text"
+                        value={verifiedPhone}
+                        className="input-field"
+                        disabled
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="senderName" className="block mb-2 font-medium">Your name *</label>
+                      <input
+                        type="text"
+                        id="senderName"
+                        name="senderName"
+                        placeholder="Your name..."
+                        value={formData.senderName}
+                        onChange={handleChange}
+                        className="input-field"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="recipientName" className="block mb-2 font-medium">Recipient's name *</label>
+                      <input
+                        type="text"
+                        id="recipientName"
+                        name="recipientName"
+                        placeholder="Their name..."
+                        value={formData.recipientName}
+                        onChange={handleChange}
+                        className="input-field"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="recipientPhone" className="block mb-2 font-medium">Recipient's WhatsApp number *</label>
+                      <input
+                        type="tel"
+                        id="recipientPhone"
+                        name="recipientPhone"
+                        placeholder="+1234567890"
+                        value={formData.recipientPhone}
+                        onChange={handleChange}
+                        className="input-field"
+                        required
+                      />
+                      <p className="text-xs text-softGrey mt-1">Must include country code (e.g., +1 for USA)</p>
+                    </div>
+                    
+                    <div className="pt-4">
+                      <button 
+                        type="button" 
+                        onClick={handleNext}
+                        className="btn-primary w-full"
+                      >
+                        Continue
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             )}
             
