@@ -5,6 +5,7 @@ import { Calendar, Clock, Volume2, Phone, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import PhoneVerification from '@/components/PhoneVerification';
 
 const SenderForm = () => {
   const navigate = useNavigate();

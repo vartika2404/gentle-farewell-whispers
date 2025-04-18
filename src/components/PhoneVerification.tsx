@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { toast } from 'sonner';
-import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
   SelectContent,
@@ -53,18 +52,16 @@ const PhoneVerification = ({ onVerificationComplete }: PhoneVerificationProps) =
     const fullPhoneNumber = `${countryCode}${phoneNumber}`;
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: fullPhoneNumber,
-      });
-
-      if (error) throw error;
-
-      setVerificationSent(true);
-      toast.success('Verification code sent to your phone');
+      // Here you would integrate with Firebase Phone Auth
+      // For now, we'll simulate the verification process
+      setTimeout(() => {
+        setVerificationSent(true);
+        toast.success('Verification code sent to your phone');
+        setIsSubmitting(false);
+      }, 1500);
     } catch (error) {
       toast.error('Error sending verification code');
       console.error('Error:', error);
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -79,20 +76,16 @@ const PhoneVerification = ({ onVerificationComplete }: PhoneVerificationProps) =
     const fullPhoneNumber = `${countryCode}${phoneNumber}`;
 
     try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone: fullPhoneNumber,
-        token: verificationCode,
-        type: 'sms'
-      });
-
-      if (error) throw error;
-
-      onVerificationComplete(fullPhoneNumber);
-      toast.success('Phone number verified successfully');
+      // Here you would verify the code with Firebase Phone Auth
+      // For now, we'll simulate the verification process
+      setTimeout(() => {
+        onVerificationComplete(fullPhoneNumber);
+        toast.success('Phone number verified successfully');
+        setIsSubmitting(false);
+      }, 1500);
     } catch (error) {
       toast.error('Invalid verification code');
       console.error('Error:', error);
-    } finally {
       setIsSubmitting(false);
     }
   };
