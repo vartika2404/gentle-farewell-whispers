@@ -1,101 +1,75 @@
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 36 33% 97%; /* #FAF6F0 */
+    --foreground: 0 0% 20%; /* #333333 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 36 33% 97%; /* #FAF6F0 */
+    --card-foreground: 0 0% 20%; /* #333333 */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 36 33% 97%; /* #FAF6F0 */
+    --popover-foreground: 0 0% 20%; /* #333333 */
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 0 38% 81%; /* #E6B8B8 */
+    --primary-foreground: 0 0% 20%; /* #333333 */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 22 100% 88%; /* #FFD6C0 */
+    --secondary-foreground: 0 0% 20%; /* #333333 */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 0 0% 53%; /* #888888 */
+    --muted-foreground: 0 0% 53%; /* #888888 */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 22 100% 88%; /* #FFD6C0 */
+    --accent-foreground: 0 0% 20%; /* #333333 */
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 0 38% 81%; /* #E6B8B8 */
+    --input: 0 38% 81%; /* #E6B8B8 */
+    --ring: 346 24% 69%; /* #D88C9A */
 
     --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
-
-@layer base {
   * {
     @apply border-border;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-sand text-charcoal font-sans leading-relaxed;
+  }
+
+  /* Custom focus styles */
+  input:focus, textarea:focus, select:focus {
+    @apply outline-none ring-2 ring-buttonPrimary;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-buttonPrimary text-white py-3 px-6 rounded-2xl hover:bg-buttonHover transition-colors duration-300 font-medium;
+  }
+  
+  .btn-secondary {
+    @apply bg-transparent border-2 border-buttonPrimary text-buttonPrimary py-3 px-6 rounded-2xl hover:bg-buttonPrimary hover:text-white transition-colors duration-300 font-medium;
+  }
+  
+  .btn-tertiary {
+    @apply bg-transparent text-buttonPrimary underline py-2 hover:text-buttonHover transition-colors duration-300;
+  }
+  
+  .input-field {
+    @apply w-full p-4 bg-white border border-dustyRose rounded-2xl placeholder:text-softGrey focus:border-buttonPrimary transition-all duration-300;
+  }
+  
+  .card {
+    @apply bg-white p-6 rounded-2xl shadow-md border border-dustyRose animate-fade-in;
   }
 }
