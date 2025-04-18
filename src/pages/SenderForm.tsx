@@ -137,76 +137,58 @@ const SenderForm = () => {
           <form onSubmit={handleSubmit}>
             {step === 1 && (
               <div className="space-y-6">
-                {!senderPhoneVerified ? (
-                  <div className="mb-6">
-                    <h3 className="font-medium mb-4">Verify your phone number *</h3>
-                    <PhoneVerification onVerificationComplete={handlePhoneVerificationComplete} />
-                  </div>
-                ) : (
-                  <>
-                    <div>
-                      <label className="block mb-2 font-medium">Your verified phone number</label>
-                      <input
-                        type="text"
-                        value={verifiedPhone}
-                        className="input-field"
-                        disabled
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="senderName" className="block mb-2 font-medium">Your name *</label>
-                      <input
-                        type="text"
-                        id="senderName"
-                        name="senderName"
-                        placeholder="Your name..."
-                        value={formData.senderName}
-                        onChange={handleChange}
-                        className="input-field"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label htmlFor="recipientName" className="block mb-2 font-medium">Recipient's name *</label>
-                      <input
-                        type="text"
-                        id="recipientName"
-                        name="recipientName"
-                        placeholder="Their name..."
-                        value={formData.recipientName}
-                        onChange={handleChange}
-                        className="input-field"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label htmlFor="recipientPhone" className="block mb-2 font-medium">Recipient's WhatsApp number *</label>
-                      <input
-                        type="tel"
-                        id="recipientPhone"
-                        name="recipientPhone"
-                        placeholder="+1234567890"
-                        value={formData.recipientPhone}
-                        onChange={handleChange}
-                        className="input-field"
-                        required
-                      />
-                      <p className="text-xs text-softGrey mt-1">Must include country code (e.g., +1 for USA)</p>
-                    </div>
-                    
-                    <div className="pt-4">
-                      <button 
-                        type="button" 
-                        onClick={handleNext}
-                        className="btn-primary w-full"
-                      >
-                        Continue
-                      </button>
-                    </div>
-                  </>
-                )}
+                <div>
+                  <label htmlFor="senderName" className="block mb-2 font-medium">Your name *</label>
+                  <input
+                    type="text"
+                    id="senderName"
+                    name="senderName"
+                    placeholder="Your name..."
+                    value={formData.senderName}
+                    onChange={handleChange}
+                    className="input-field"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="recipientName" className="block mb-2 font-medium">Recipient's name *</label>
+                  <input
+                    type="text"
+                    id="recipientName"
+                    name="recipientName"
+                    placeholder="Their name..."
+                    value={formData.recipientName}
+                    onChange={handleChange}
+                    className="input-field"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="recipientPhone" className="block mb-2 font-medium">Recipient's WhatsApp number *</label>
+                  <input
+                    type="tel"
+                    id="recipientPhone"
+                    name="recipientPhone"
+                    placeholder="+1234567890"
+                    value={formData.recipientPhone}
+                    onChange={handleChange}
+                    className="input-field"
+                    required
+                  />
+                  <p className="text-xs text-softGrey mt-1">Must include country code (e.g., +1 for USA)</p>
+                </div>
+                
+                <div className="pt-4">
+                  <button 
+                    type="button" 
+                    onClick={handleNext}
+                    className="btn-primary w-full"
+                  >
+                    Continue
+                  </button>
+                </div>
               </div>
             )}
             
@@ -379,44 +361,7 @@ const SenderForm = () => {
                   <p className="text-softGrey">Before sending, please verify your phone number</p>
                 </div>
                 
-                {!verificationSent ? (
-                  <div>
-                    <label htmlFor="senderPhone" className="block mb-2 font-medium">Your phone number *</label>
-                    <Input
-                      type="tel"
-                      id="senderPhone"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      placeholder="+1 (234) 567-8901"
-                      className="input-field"
-                      required
-                    />
-                    <p className="text-xs text-softGrey mt-1">Include your country code (e.g., +1 for USA)</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <label className="block mb-2 font-medium">Enter the 6-digit code sent to your phone</label>
-                    <div className="flex justify-center mb-4">
-                      <InputOTP 
-                        maxLength={6}
-                        value={verificationCode}
-                        onChange={(value) => setVerificationCode(value)}
-                      >
-                        <InputOTPGroup>
-                          <InputOTPSlot index={0} />
-                          <InputOTPSlot index={1} />
-                          <InputOTPSlot index={2} />
-                          <InputOTPSlot index={3} />
-                          <InputOTPSlot index={4} />
-                          <InputOTPSlot index={5} />
-                        </InputOTPGroup>
-                      </InputOTP>
-                    </div>
-                    <p className="text-xs text-softGrey mb-4 text-center">
-                      Didn't receive a code? <button type="button" onClick={() => setVerificationSent(false)} className="text-buttonPrimary hover:underline">Try again</button>
-                    </p>
-                  </div>
-                )}
+                <PhoneVerification onVerificationComplete={handlePhoneVerificationComplete} />
                 
                 <div className="border-t border-dustyRose pt-6 mt-6">
                   <h3 className="font-medium mb-4">Message Summary:</h3>
@@ -441,9 +386,9 @@ const SenderForm = () => {
                   <button 
                     type="submit"
                     className="btn-primary flex items-center gap-2"
-                    disabled={isSubmitting || (verificationSent && verificationCode.length !== 6)}
+                    disabled={isSubmitting}
                   >
-                    {isSubmitting ? 'Processing...' : verificationSent ? 'Verify & Send' : 'Send verification code'}
+                    {isSubmitting ? 'Processing...' : 'Send message'}
                   </button>
                 </div>
               </div>
