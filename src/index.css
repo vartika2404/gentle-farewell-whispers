@@ -39,7 +39,7 @@
   }
 
   * {
-    @apply border-border;
+    @apply border-[hsl(var(--border))] border-opacity-100;
   }
 
   body {
